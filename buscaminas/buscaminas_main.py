@@ -1,3 +1,5 @@
+import random
+
 def jugar():
     print("¡Bienvenido a Buscaminas!")
     print("[1] Fácil")
@@ -6,7 +8,7 @@ def jugar():
     dificultad = int(input("Selecciona la dificultad: "))
     
     minas = generarMinas(dificultad)
-    tablero = desplegar_tablero(dificultad)
+    tablero = desplegar_tablero(dificultad, minas)
     
     for f in tablero:
         print(" ".join(f))
@@ -19,24 +21,22 @@ def jugar():
         if accion == "d":
             descubrir_celda(fila, columna)
         elif accion == "m":
-            marcar_mina(fila, columna)
+            marcar_mina(tablero, fila, columna)
         else:
             print("Acción no válida.")
     
-def desplegar_tablero(dificultad):
-    tablero = generar_tablero(dificultad)
+def desplegar_tablero(dificultad, minas):
+    # lógica para desplegar el tablero según la dificultad
+    tamaño = dificultad * 5
+    tablero = [["-" for _ in range(tamaño)] for _ in range(tamaño)]
+    
+    # lógica para colocar minas en el tablero
+    for _ in range(minas):
+        fila = random.randint(0, tamaño - 1)
+        columna = random.randint(0, tamaño - 1)
+        tablero[fila][columna] = "M"
         
     return tablero
-        
-def generar_tablero(dificultad):
-    # agregar minas en posiciones aleatorias según la dificultad
-    tablero = []
-    
-    for i in range(10*dificultad):
-        fila = []
-        for j in range(10):
-            fila.append("-")
-        tablero.append(fila)
     
 def descubrir_celda(fila, columna):
     pass
@@ -44,3 +44,13 @@ def descubrir_celda(fila, columna):
 def generarMinas(dificultad):
     # lógica para generar minas según la dificultad
     return 10 * dificultad
+
+def marcar_mina(tablero, fila, columna):
+    for i in range(len(tablero)):
+        for j in range(len(tablero)):
+            if i == fila and j == columna:
+                tablero[i][j] = "X"
+                print("Mina marcada en ({}, {})".format(fila, columna))
+                return
+    
+    
