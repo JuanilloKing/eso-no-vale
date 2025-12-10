@@ -1,31 +1,46 @@
 def jugar():
-    dificultad = menu()
-    desplegar_tablero(dificultad)
-    
-def menu():
     print("¡Bienvenido a Buscaminas!")
     print("[1] Fácil")
     print("[2] Medio")
     print("[3] Difícil")
-    dificultad = input("Selecciona la dificultad: ")
+    dificultad = int(input("Selecciona la dificultad: "))
     
-    if dificultad == "1":
-        return 1
-    elif dificultad == "2":
-        return 2
-    elif dificultad == "3":
-        return 3
+    minas = generarMinas(dificultad)
+    tablero = desplegar_tablero(dificultad)
+    
+    for f in tablero:
+        print(" ".join(f))
+    
+    while minas != 0:
+        accion = input("¿Quieres descubrir una celda (d) o marcar una mina (m)? ")
+        fila = int(input("Ingresa la fila: "))
+        columna = int(input("Ingresa la columna: "))
+        
+        if accion == "d":
+            descubrir_celda(fila, columna)
+        elif accion == "m":
+            marcar_mina(fila, columna)
+        else:
+            print("Acción no válida.")
     
 def desplegar_tablero(dificultad):
     tablero = generar_tablero(dificultad)
-    for fila in tablero:
-        print(" ".join(fila))
+        
+    return tablero
         
 def generar_tablero(dificultad):
-    if dificultad == 1:
-        return [["." for _ in range(5)] for _ in range(5)]
-    elif dificultad == 2:
-        return [["." for _ in range(8)] for _ in range(8)]
-    elif dificultad == 3:
-        return [["." for _ in range(10)] for _ in range(10)]
+    # agregar minas en posiciones aleatorias según la dificultad
+    tablero = []
     
+    for i in range(10*dificultad):
+        fila = []
+        for j in range(10):
+            fila.append("-")
+        tablero.append(fila)
+    
+def descubrir_celda(fila, columna):
+    pass
+
+def generarMinas(dificultad):
+    # lógica para generar minas según la dificultad
+    return 10 * dificultad
