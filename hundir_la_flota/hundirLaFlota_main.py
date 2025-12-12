@@ -1,8 +1,8 @@
 import sys
 import random 
 
-TAMANO_TABLERO = 10
-BARCOS = {
+tamano_tablero = 10
+barcos = {
     "Portaaviones": 5,
     "Acorazado": 4,
     "Submarino": 3,
@@ -17,14 +17,14 @@ def crear_matriz_base(tamano):
 def mostrar_tablero_consola(matriz, nombre_tablero):
     """
     Imprime un tablero de 10x10 en la consola a partir de la matriz.
-    Muestra 'A', 'H' (Hit/Impacto), 'M' (Miss/Agua fallada) y 'B' (Barco).
+    Muestra 'A' (Agua), 'H' (Hit/Impacto), 'M' (Miss/Agua fallada) y 'B' (Barco).
     """
     columnas = len(matriz[0])
     
     etiquetas_columnas = " " * 3 + " ".join([chr(65 + i) for i in range(columnas)])
     print(f"\n {"Jugador 1: " + nombre_tablero.upper()}")
     print(etiquetas_columnas)
-    print("---" + "---" * columnas)
+    print("------" * columnas)
     
     for i, fila in enumerate(matriz):
         numero_fila = i + 1
@@ -33,18 +33,29 @@ def mostrar_tablero_consola(matriz, nombre_tablero):
         visual_fila = []
         for casilla in fila:
             if casilla == 'A':    
-                visual_fila.append('.')
+                visual_fila.append('A')
             elif casilla == 'B':  
                 visual_fila.append('B') 
             elif casilla == 'H':  
-                visual_fila.append('💥')
+                visual_fila.append('H')
             elif casilla == 'M':  
-                visual_fila.append('o')
+                visual_fila.append('M')
             else:
                 visual_fila.append('.')
         
         contenido_fila = " ".join(visual_fila)
         print(f"{etiqueta_fila}{contenido_fila}")
+        
+def esta_vivo(matriz):
+    """
+    Recorre la matriz para verificar si queda algún barco ('B').
+    Retorna True si hay al menos un barco vivo, False si no queda ninguno.
+    """
+    for fila in matriz:
+        for casilla in fila:
+            if casilla == 'B':
+                return True  
+    return False
 
 
 def colocar_barcos_aleatorios(tablero, barcos_a_colocar):
@@ -82,24 +93,76 @@ def colocar_barcos_aleatorios(tablero, barcos_a_colocar):
     
     return tablero
 
-def iniciar_juego():
-    """Inicializa matrices, coloca barcos y comienza el ciclo de juego."""
+def juego():
+    """Bucle que dirige el programa de todo el juego"""
     print("-" * 50)
     print("INICIALIZANDO NUEVA PARTIDA...")
     nombre = input("Introduce tu nombre para jugar: ")
     
-    tablero_maquina_secreto = crear_matriz_base(TAMANO_TABLERO)
-    tablero_maquina_secreto = colocar_barcos_aleatorios(tablero_maquina_secreto, BARCOS)
+    tablero_maquina_oculto = crear_matriz_base(tamano_tablero)
+    tablero_maquina_oculto = colocar_barcos_aleatorios(tablero_maquina_oculto, barcos)
     
-    tablero_jugador_ataque = crear_matriz_base(TAMANO_TABLERO)
+    tablero_jugador_ataque = crear_matriz_base(tamano_tablero)
+    tablero_jugador = crear_matriz_base(tamano_tablero)
+    colocar_barcos_aleatorios(tablero_jugador, barcos)
     
-    print("\n✅ Barcos del rival colocados aleatoriamente.")
+    print("\nBarcos del rival colocados aleatoriamente.")
     
     mostrar_tablero_consola(tablero_jugador_ataque, nombre)
-    
-    
     print("-" * 50)
-    input("Presiona Enter para volver al menú...")
+
+    while esta_vivo(tablero_maquina_oculto) and esta_vivo(tablero_jugador):
+        
+        mostrar_tablero_consola(tablero_jugador_ataque, f"RADAR DE {nombre}")
+        
+        print("\n--- TU TURNO ---")
+        try:
+            fila = int(input("Introduce Fila (1-10): ")) - 1
+            col_letra = input("Introduce Columna (A-J): ").upper()
+            letras = 'ABCDEFGHIJ'
+
+            # Verificamos que las coordenadas estén dentro del tablero
+            if 0 <= fila < 10 and col_letra in letras:
+                for i in range(len(letras)):
+                    if letras[i] == col_letra:
+                        col = i
+                celda_objetivo = tablero_maquina_oculto[fila][col]
+
+                if celda_objetivo == 'B':
+                    print("¡¡IMPACTO!! Le has dado a un barco enemigo.")
+                    tablero_maquina_oculto[fila][col] = 'H' # Marcamos daño en el secreto
+                    tablero_jugador_ataque[fila][col] = 'H'  # Marcamos acierto en tu radar
+                elif celda_objetivo == '~':
+                    print("¡Agua! No has dado a nada.")
+                    tablero_maquina_oculto[fila][col] = 'M'
+                    tablero_jugador_ataque[fila][col] = 'M'
+                else:
+                    print("Eres tonto. Pierdes el turno.")
+            else:
+                print("Coordenadas fuera de rango. Pierdes el turno.")
+        
+        except ValueError:
+            print("Entrada no válida. Pierdes el turno.")
+
+        print("\n--- TURNO DE LA MÁQUINA ---")
+        f_maq = random.randint(0, 9)
+        c_maq = random.randint(0, 9)
+        
+        if tablero_jugador[f_maq][c_maq] == 'B':
+            tablero_jugador[f_maq][c_maq] = 'H'
+            print(f"La máquina ha disparado en {f_maq+1}{chr(c_maq+65)} y... ¡TE HA DADO!")
+        elif tablero_jugador[f_maq][c_maq] == '~':
+            tablero_jugador[f_maq][c_maq] = 'M'
+            print(f"La máquina ha disparado en {f_maq+1}{chr(c_maq+65)} y... ha fallado.")
+        else:
+            print("La máquina ha disparado a una zona ya bombardeada.")
+
+    print("-" * 50)
+    if esta_vivo(tablero_jugador):
+        print(f"¡FELICIDADES {nombre}! Has hundido toda la flota enemiga.")
+    else:
+        print("¡GAME OVER! La máquina ha hundido toda tu flota.")
+    print("-" * 50)
 
 
 def mostrar_menu_inicial():
@@ -128,20 +191,19 @@ def salir_del_juego():
     print("\n¡Gracias por jugar! ¡Hasta pronto!")
     sys.exit()
 
-def ejecutar_menu():
+def jugar():
     """Función principal que maneja la navegación del menú."""
     while True: 
         mostrar_menu_inicial()
         opcion = input("Elige una opción (1-3): ").strip()
-        
         if opcion == '1':
-            iniciar_juego()
+            juego()
         elif opcion == '2':
             mostrar_reglas()
         elif opcion == '3':
             salir_del_juego()
         else:
-            print("❌ Opción no válida. Por favor, introduce 1, 2 o 3.")
+            print("Opción no válida. Por favor, introduce 1, 2 o 3.")
 
 if __name__ == "__main__":
-    ejecutar_menu()
+    jugar()
