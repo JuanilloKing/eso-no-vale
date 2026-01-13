@@ -92,6 +92,46 @@ def colocar_barcos_aleatorios(tablero, barcos_a_colocar):
     
     return tablero
 
+def colocar_barcos_jugador(tablero, barcos_a_colocar):
+    print(f"A CONTINUACIÓN DEBERÁS COLOCAR TUS BARCOS EN EL TABLERO")
+    while not barcos_a_colocar == {}:
+        print("Estos son los barcos que te quedan por colocar:")
+        i == 1
+        for nombre, longitud in barcos_a_colocar.items():
+            print(f"{i}- Barco: {nombre}, longitud del barco: {longitud}")
+            i += 1
+        
+        opcion = int(input("Selecciona un barco escribiento su número para ponerlo en tu tablero: "))
+        match opcion :
+            case 1: 
+                print("Barco seleccionado: Portaaviones, longitud: 5")
+                while True:
+                    verticalHorizontal = int(input("Selecciona como quieres poner el barco: 1-horizontal, 2- vertical"))
+                    if verticalHorizontal == 1 or verticalHorizontal == 2:
+                        break
+                    print("Opción inválida")
+                
+                print("Ahora seleccionarás la casilla donde quieres posicionar el barco.\n" \
+                        "Si seleccionaste horizontal, el barco se colocara desde la casilla seleccionada hacia la derecha\n" \
+                        "Si seleccionaste vertical, el barco se colocará desde la casilla seleccionada hacia abajo")
+                while True:
+                    fila = int(input("Introduce Fila (1-10): ")) - 1
+                    col_letra = input("Introduce Columna (A-J): ").upper()
+                    if verticalHorizontal == 1:
+                        letrasValidas = 'ABCDEF' #Solo puedes elegir hasta la f por que si seleccionas una letra mas adelante, no cabría el barco en el tablero
+                        if 0 <= fila < 10 and col_letra in letrasValidas:
+                            break
+                    elif verticalHorizontal == 2: #Solo puedes elegir hasta el 5 por que si seleccionas un numero mas adelante, no cabría el barco en el tablero
+                        letrasValidas = 'ABCDEFGHIJ'
+                        if 0 <= fila < 6 and col_letra in letrasValidas: 
+                            break
+                    print("Casilla inválida o el barco no cabe en el tablero")
+
+
+
+
+    return tablero
+
 def juego():
     """Bucle que dirige el programa de todo el juego"""
     print("-" * 50)
@@ -103,7 +143,7 @@ def juego():
     
     tablero_jugador_ataque = crear_matriz_base(tamano_tablero)
     tablero_jugador = crear_matriz_base(tamano_tablero)
-    colocar_barcos_aleatorios(tablero_jugador, barcos)
+    colocar_barcos_jugador(tablero_jugador, barcos)
     
     print("\nBarcos del rival colocados aleatoriamente.")
     
@@ -113,6 +153,8 @@ def juego():
     while esta_vivo(tablero_maquina_oculto) and esta_vivo(tablero_jugador):
         
         mostrar_tablero_consola(tablero_jugador_ataque, f"RADAR DE {nombre}")
+        mostrar_tablero_consola(tablero_jugador, f"RADAR DE {nombre}")
+        mostrar_tablero_consola(tablero_maquina_oculto, f"RADAR DE {nombre}")
         
         print("\n--- TU TURNO ---")
         try:
