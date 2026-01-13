@@ -17,12 +17,12 @@ def crear_matriz_base(tamano):
 def mostrar_tablero_consola(matriz, nombre_tablero):
     """
     Imprime un tablero de 10x10 en la consola a partir de la matriz.
-    Muestra 'A' (Agua), 'H' (Hit/Impacto), 'M' (Miss/Agua fallada) y 'B' (Barco).
+    Muestra 'A' (Agua), 'H' (Hit/Impacto), 'N' (Nada (disparo en agua) ) y 'B' (Barco).
     """
     columnas = len(matriz[0])
     
     etiquetas_columnas = " " * 3 + " ".join([chr(65 + i) for i in range(columnas)])
-    print(f"\n {"Jugador 1: " + nombre_tablero.upper()}")
+    print(f"\n {'Jugador 1: ' + nombre_tablero.upper()}")
     print(etiquetas_columnas)
     print("------" * columnas)
     
@@ -38,17 +38,16 @@ def mostrar_tablero_consola(matriz, nombre_tablero):
                 visual_fila.append('B') 
             elif casilla == 'H':  
                 visual_fila.append('H')
-            elif casilla == 'M':  
-                visual_fila.append('M')
+            elif casilla == 'N':  
+                visual_fila.append('N')
             else:
                 visual_fila.append('.')
         
         contenido_fila = " ".join(visual_fila)
         print(f"{etiqueta_fila}{contenido_fila}")
-        
+
 def esta_vivo(matriz):
     """
-    Recorre la matriz para verificar si queda algún barco ('B').
     Retorna True si hay al menos un barco vivo, False si no queda ninguno.
     """
     for fila in matriz:
@@ -176,8 +175,8 @@ def juego():
                     tablero_jugador_ataque[fila][col] = 'H'  # Marcamos acierto en tu radar
                 elif celda_objetivo == '~':
                     print("¡Agua! No has dado a nada.")
-                    tablero_maquina_oculto[fila][col] = 'M'
-                    tablero_jugador_ataque[fila][col] = 'M'
+                    tablero_maquina_oculto[fila][col] = 'N'
+                    tablero_jugador_ataque[fila][col] = 'N'
                 else:
                     print("Eres tonto. Pierdes el turno.")
             else:
@@ -194,7 +193,7 @@ def juego():
             tablero_jugador[f_maq][c_maq] = 'H'
             print(f"La máquina ha disparado en {f_maq+1}{chr(c_maq+65)} y... ¡TE HA DADO!")
         elif tablero_jugador[f_maq][c_maq] == '~':
-            tablero_jugador[f_maq][c_maq] = 'M'
+            tablero_jugador[f_maq][c_maq] = 'N'
             print(f"La máquina ha disparado en {f_maq+1}{chr(c_maq+65)} y... ha fallado.")
         else:
             print("La máquina ha disparado a una zona ya bombardeada.")
