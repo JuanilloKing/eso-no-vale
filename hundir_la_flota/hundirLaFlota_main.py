@@ -92,40 +92,94 @@ def colocar_barcos_aleatorios(tablero, barcos_a_colocar):
     
     return tablero
 
-def colocar_barcos_jugador(tablero, barcos_a_colocar):
+def colocar_barcos_jugador(tablero, barcos):
+    barcos_a_colocar = barcos.copy()
     print(f"A CONTINUACIÓN DEBERÁS COLOCAR TUS BARCOS EN EL TABLERO")
     while not barcos_a_colocar == {}:
+        barcoSelecColocado = False
         print("Estos son los barcos que te quedan por colocar:")
-        i == 1
-        for nombre, longitud in barcos_a_colocar.items():
-            print(f"{i}- Barco: {nombre}, longitud del barco: {longitud}")
-            i += 1
+        # Esto SÍ debería funcionar para mostrar 1, 2, 4, 5 si eliminaste el barco 3
+        i = 1
+        for nombre, longitud in barcos.items():  # Itera TODOS los barcos en orden fijo
+            if nombre in barcos_a_colocar:  # Solo muestra los que aún están disponibles
+                print(f"{i}- Barco: {nombre}, longitud del barco: {longitud}")
+            i += 1  # Incrementa SIEMPRE para mantener numeración fija      
         
         opcion = int(input("Selecciona un barco escribiento su número para ponerlo en tu tablero: "))
         match opcion :
             case 1: 
-                print("Barco seleccionado: Portaaviones, longitud: 5")
-                while True:
-                    verticalHorizontal = int(input("Selecciona como quieres poner el barco: 1-horizontal, 2- vertical"))
-                    if verticalHorizontal == 1 or verticalHorizontal == 2:
-                        break
-                    print("Opción inválida")
-                
-                print("Ahora seleccionarás la casilla donde quieres posicionar el barco.\n" \
-                        "Si seleccionaste horizontal, el barco se colocara desde la casilla seleccionada hacia la derecha\n" \
-                        "Si seleccionaste vertical, el barco se colocará desde la casilla seleccionada hacia abajo")
-                while True:
-                    fila = int(input("Introduce Fila (1-10): ")) - 1
-                    col_letra = input("Introduce Columna (A-J): ").upper()
-                    if verticalHorizontal == 1:
-                        letrasValidas = 'ABCDEF' #Solo puedes elegir hasta la f por que si seleccionas una letra mas adelante, no cabría el barco en el tablero
-                        if 0 <= fila < 10 and col_letra in letrasValidas:
-                            break
-                    elif verticalHorizontal == 2: #Solo puedes elegir hasta el 5 por que si seleccionas un numero mas adelante, no cabría el barco en el tablero
-                        letrasValidas = 'ABCDEFGHIJ'
-                        if 0 <= fila < 6 and col_letra in letrasValidas: 
-                            break
-                    print("Casilla inválida o el barco no cabe en el tablero")
+                if "Portaaviones" in barcos_a_colocar:
+                    nombreBarcoSelec = "Portaaviones"
+                    longBarcoSelec = 5
+                    letrasValidas = "ABCDEF"
+                    barcos_a_colocar.pop("Portaaviones")
+                else:
+                    barcoSelecColocado = True
+                    print("¡Ya has colocado ese barco!")
+                    continue
+            case 2:
+                if "Acorazado" in barcos_a_colocar:
+                    nombreBarcoSelec = "Acorazado"
+                    longBarcoSelec = 4
+                    letrasValidas = "ABCDEFG"
+                    barcos_a_colocar.pop("Acorazado")
+                else:
+                    barcoSelecColocado = True
+                    print("¡Ya has colocado ese barco!")
+                    continue
+            case 3: 
+                if "Submarino" in barcos_a_colocar:
+                    nombreBarcoSelec = "Submarino"
+                    longBarcoSelec = 3
+                    letrasValidas = "ABCDEFGH"
+                    barcos_a_colocar.pop("Submarino")
+                else:
+                    barcoSelecColocado = True
+                    print("¡Ya has colocado ese barco!")
+                    continue
+            case 4:
+                if "Destructor" in barcos_a_colocar:   
+                    nombreBarcoSelec = "Destructor"
+                    longBarcoSelec = 3
+                    letrasValidas = "ABCDEFGH"
+                    barcos_a_colocar.pop("Destructor")
+                else:
+                    barcoSelecColocado = True
+                    print("¡Ya has colocado ese barco!")
+                    continue
+            case 5:
+                if "Lancha" in barcos_a_colocar:
+                    nombreBarcoSelec = "Lancha"
+                    longBarcoSelec = 2
+                    letrasValidas = "ABCDEFGHI"
+                    barcos_a_colocar.pop("Lancha")
+                else:
+                    barcoSelecColocado = True
+                    print("¡Ya has colocado ese barco!")
+                    continue
+    
+        print(f"Barco seleccionado: {nombreBarcoSelec}, longitud: {longBarcoSelec}")
+        while True:
+            verticalHorizontal = int(input("Selecciona como quieres poner el barco: 1-horizontal, 2- vertical"))
+            if verticalHorizontal == 1 or verticalHorizontal == 2:
+                break
+            print("Opción inválida")
+        
+        print("Ahora seleccionarás la casilla donde quieres posicionar el barco.\n" \
+                "Si seleccionaste horizontal, el barco se colocara desde la casilla seleccionada hacia la derecha\n" \
+                "Si seleccionaste vertical, el barco se colocará desde la casilla seleccionada hacia abajo")
+        while True:
+            fila = int(input("Introduce Fila (1-10): ")) - 1
+            col_letra = input("Introduce Columna (A-J): ").upper()
+            if verticalHorizontal == 1:
+                 #Solo puedes elegir una letra dentro de las validas por que si seleccionas una letra mas adelante, no cabría el barco en el tablero
+                if 0 <= fila < 10 and col_letra in letrasValidas:
+                    break
+            elif verticalHorizontal == 2: #Solo puedes elegir hasta el 11-longBarcoSelec por que si seleccionas un numero mas adelante, no cabría el barco en el tablero
+                letrasValidas = 'ABCDEFGHIJ'
+                if 0 <= fila < 11-longBarcoSelec and col_letra in letrasValidas: 
+                    break
+            print("Casilla inválida o el barco no cabe en el tablero")
 
 
 
