@@ -157,7 +157,7 @@ def colocar_barcos_jugador(tablero, barcos):
                     barcoSelecColocado = True
                     print("¡Ya has colocado ese barco!")
                     continue
-    
+
         print(f"Barco seleccionado: {nombreBarcoSelec}, longitud: {longBarcoSelec}")
         while True:
             verticalHorizontal = int(input("Selecciona como quieres poner el barco: 1-horizontal, 2- vertical"))
