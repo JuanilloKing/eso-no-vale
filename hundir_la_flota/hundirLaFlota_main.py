@@ -94,9 +94,10 @@ def colocar_barcos_aleatorios(tablero, barcos_a_colocar):
 
 def colocar_barcos_jugador(tablero, barcos):
     barcos_a_colocar = barcos.copy()
+    mostrar_tablero_consola(tablero, "Tu tablero actual")
     print(f"A CONTINUACIÓN DEBERÁS COLOCAR TUS BARCOS EN EL TABLERO")
     while not barcos_a_colocar == {}:
-        barcoSelecColocado = False
+        
         print("Estos son los barcos que te quedan por colocar:")
         # Esto SÍ debería funcionar para mostrar 1, 2, 4, 5 si eliminaste el barco 3
         i = 1
@@ -105,7 +106,12 @@ def colocar_barcos_jugador(tablero, barcos):
                 print(f"{i}- Barco: {nombre}, longitud del barco: {longitud}")
             i += 1  # Incrementa SIEMPRE para mantener numeración fija      
         
-        opcion = int(input("Selecciona un barco escribiento su número para ponerlo en tu tablero: "))
+        try:
+            opcion = int(input("Selecciona un barco escribiendo su número para ponerlo en tu tablero: "))
+        except ValueError:
+            print("Introduce una opción válida")
+            continue
+
         match opcion :
             case 1: 
                 if "Portaaviones" in barcos_a_colocar:
@@ -114,7 +120,7 @@ def colocar_barcos_jugador(tablero, barcos):
                     letrasValidas = "ABCDEF"
                     barcos_a_colocar.pop("Portaaviones")
                 else:
-                    barcoSelecColocado = True
+                    
                     print("¡Ya has colocado ese barco!")
                     continue
             case 2:
@@ -124,7 +130,7 @@ def colocar_barcos_jugador(tablero, barcos):
                     letrasValidas = "ABCDEFG"
                     barcos_a_colocar.pop("Acorazado")
                 else:
-                    barcoSelecColocado = True
+                    
                     print("¡Ya has colocado ese barco!")
                     continue
             case 3: 
@@ -134,7 +140,7 @@ def colocar_barcos_jugador(tablero, barcos):
                     letrasValidas = "ABCDEFGH"
                     barcos_a_colocar.pop("Submarino")
                 else:
-                    barcoSelecColocado = True
+                    
                     print("¡Ya has colocado ese barco!")
                     continue
             case 4:
@@ -144,7 +150,7 @@ def colocar_barcos_jugador(tablero, barcos):
                     letrasValidas = "ABCDEFGH"
                     barcos_a_colocar.pop("Destructor")
                 else:
-                    barcoSelecColocado = True
+                    
                     print("¡Ya has colocado ese barco!")
                     continue
             case 5:
@@ -154,13 +160,16 @@ def colocar_barcos_jugador(tablero, barcos):
                     letrasValidas = "ABCDEFGHI"
                     barcos_a_colocar.pop("Lancha")
                 else:
-                    barcoSelecColocado = True
+                    
                     print("¡Ya has colocado ese barco!")
                     continue
+            case _:
+                print("Por favor, introduce una opción válida")
+                continue
     
         print(f"Barco seleccionado: {nombreBarcoSelec}, longitud: {longBarcoSelec}")
         while True:
-            verticalHorizontal = int(input("Selecciona como quieres poner el barco: 1-horizontal, 2- vertical"))
+            verticalHorizontal = int(input("Selecciona como quieres poner el barco: 1-horizontal, 2- vertical: "))
             if verticalHorizontal == 1 or verticalHorizontal == 2:
                 break
             print("Opción inválida")
@@ -169,22 +178,50 @@ def colocar_barcos_jugador(tablero, barcos):
                 "Si seleccionaste horizontal, el barco se colocara desde la casilla seleccionada hacia la derecha\n" \
                 "Si seleccionaste vertical, el barco se colocará desde la casilla seleccionada hacia abajo")
         while True:
-            fila = int(input("Introduce Fila (1-10): ")) - 1
+            try:
+                fila = int(input("Introduce Fila (1-10): ")) - 1
+            except ValueError:
+                print("Introduce una fila valida por favor")
+                continue
+                
             col_letra = input("Introduce Columna (A-J): ").upper()
-            if verticalHorizontal == 1:
-                 #Solo puedes elegir una letra dentro de las validas por que si seleccionas una letra mas adelante, no cabría el barco en el tablero
-                if 0 <= fila < 10 and col_letra in letrasValidas:
-                    break
-            elif verticalHorizontal == 2: #Solo puedes elegir hasta el 11-longBarcoSelec por que si seleccionas un numero mas adelante, no cabría el barco en el tablero
-                letrasValidas = 'ABCDEFGHIJ'
-                if 0 <= fila < 11-longBarcoSelec and col_letra in letrasValidas: 
-                    break
+            if verticalHorizontal == 1 and 0 <= fila < 10 and col_letra in letrasValidas:
+                if colocarBarcoSeleccionado(tablero, longBarcoSelec, fila, col_letra, verticalHorizontal):
+                    break  # salió bien
+            elif verticalHorizontal == 2 and 0 <= fila < 11-longBarcoSelec and col_letra in letrasValidas:
+                if colocarBarcoSeleccionado(tablero, longBarcoSelec, fila, col_letra, verticalHorizontal):
+                    break  # salió bien
             print("Casilla inválida o el barco no cabe en el tablero")
-
-
-
+        mostrar_tablero_consola(tablero, "Tu tablero actual")
 
     return tablero
+
+import copy
+
+def colocarBarcoSeleccionado(tablero, longBarcoSelec, fila, col_letra, verticalHorizontal):
+    letras = "ABCDEFGHIJ"
+    columna = letras.index(col_letra)
+
+    if verticalHorizontal == 1:  # horizontal
+        for i in range(longBarcoSelec):
+            if tablero[fila][columna + i] == "B":
+                print("El barco colisiona con otro")
+                return False
+        for i in range(longBarcoSelec):
+            tablero[fila][columna + i] = "B"
+
+    elif verticalHorizontal == 2:  # vertical
+        for i in range(longBarcoSelec):
+            if tablero[fila + i][columna] == "B":
+                print("El barco colisiona con otro")
+                return False
+        for i in range(longBarcoSelec):
+            tablero[fila + i][columna] = "B"
+    else:
+        print("Ha ocurrido un error")
+        exit()
+
+    return True
 
 def juego():
     """Bucle que dirige el programa de todo el juego"""
