@@ -1,6 +1,10 @@
+import copy
 import sys
 import random
-
+# TODO: Cuando te equivocas al disparar, que te deje volver a disprar
+# TODO: Cambiar la 'X' de impacto del rival, por emojis
+# TODO: Cuando destruyes un barco, que te lo haga saber
+# TODO: mejorar la visibilidad en la colocación de barcos
 tamano_tablero = 10
 barcos = {
     "Portaaviones": 5,
@@ -14,6 +18,40 @@ barcos = {
 def crear_matriz_base(tamano):
     """Crea y devuelve una matriz (lista de listas) inicializada"""
     return [['~'] * tamano for _ in range(tamano)]
+
+
+def mostrar_tablero_consola(matriz, nombre_tablero):
+    """
+    Imprime un tablero de 10x10 en la consola a partir de la matriz.
+    Muestra 'A' (Agua), 'H' (Hit/Impacto), 'N' (Nada (disparo en agua) ) y 'B' (Barco).
+    """
+    columnas = len(matriz[0])
+
+    etiquetas_columnas = " " * 3 + \
+        " ".join([chr(65 + i) for i in range(columnas)])
+    print(f"\n {'Jugador 1: ' + nombre_tablero.upper()}")
+    print(etiquetas_columnas)
+    print("------" * columnas)
+
+    for i, fila in enumerate(matriz):
+        numero_fila = i + 1
+        etiqueta_fila = f"{numero_fila:2d}|"
+
+        visual_fila = []
+        for casilla in fila:
+            if casilla == 'A':
+                visual_fila.append('A')
+            elif casilla == 'B':
+                visual_fila.append('B')
+            elif casilla == 'H':
+                visual_fila.append('H')
+            elif casilla == 'N':
+                visual_fila.append('N')
+            else:
+                visual_fila.append('.')
+
+        contenido_fila = " ".join(visual_fila)
+        print(f"{etiqueta_fila}{contenido_fila}")
 
 
 def mostrar_ambos_tableros(matriz_ataque, matriz_defensa, nombre):
@@ -110,29 +148,30 @@ def colocar_barcos_jugador(tablero, barcos):
     mostrar_tablero_consola(tablero, "Tu tablero actual")
     print(f"A CONTINUACIÓN DEBERÁS COLOCAR TUS BARCOS EN EL TABLERO")
     while not barcos_a_colocar == {}:
-        
+
         print("Estos son los barcos que te quedan por colocar:")
         i = 1
         for nombre, longitud in barcos.items():  # Itera TODOS los barcos en orden fijo
             if nombre in barcos_a_colocar:  # Solo muestra los que aún están disponibles
                 print(f"{i}- Barco: {nombre}, longitud del barco: {longitud}")
-            i += 1  # Incrementa SIEMPRE para mantener numeración fija      
-        
+            i += 1  # Incrementa SIEMPRE para mantener numeración fija
+
         try:
-            opcion = int(input("Selecciona un barco escribiendo su número para ponerlo en tu tablero: "))
+            opcion = int(
+                input("Selecciona un barco escribiendo su número para ponerlo en tu tablero: "))
         except ValueError:
             print("Introduce una opción válida")
             continue
 
-        match opcion :
-            case 1: 
+        match opcion:
+            case 1:
                 if "Portaaviones" in barcos_a_colocar:
                     nombreBarcoSelec = "Portaaviones"
                     longBarcoSelec = 5
                     letrasValidas = "ABCDEF"
                     barcos_a_colocar.pop("Portaaviones")
                 else:
-                    
+
                     print("¡Ya has colocado ese barco!")
                     continue
             case 2:
@@ -142,7 +181,7 @@ def colocar_barcos_jugador(tablero, barcos):
                     letrasValidas = "ABCDEFG"
                     barcos_a_colocar.pop("Acorazado")
                 else:
-                    
+
                     print("¡Ya has colocado ese barco!")
                     continue
             case 3:
@@ -152,7 +191,7 @@ def colocar_barcos_jugador(tablero, barcos):
                     letrasValidas = "ABCDEFGH"
                     barcos_a_colocar.pop("Submarino")
                 else:
-                    
+
                     print("¡Ya has colocado ese barco!")
                     continue
             case 4:
@@ -162,7 +201,7 @@ def colocar_barcos_jugador(tablero, barcos):
                     letrasValidas = "ABCDEFGH"
                     barcos_a_colocar.pop("Destructor")
                 else:
-                    
+
                     print("¡Ya has colocado ese barco!")
                     continue
             case 5:
@@ -172,16 +211,18 @@ def colocar_barcos_jugador(tablero, barcos):
                     letrasValidas = "ABCDEFGHI"
                     barcos_a_colocar.pop("Lancha")
                 else:
-                    
+
                     print("¡Ya has colocado ese barco!")
                     continue
             case _:
                 print("Por favor, introduce una opción válida")
                 continue
-    
-        print(f"Barco seleccionado: {nombreBarcoSelec}, longitud: {longBarcoSelec}")
+
+        print(
+            f"Barco seleccionado: {nombreBarcoSelec}, longitud: {longBarcoSelec}")
         while True:
-            verticalHorizontal = int(input("Selecciona como quieres poner el barco: 1-horizontal, 2- vertical: "))
+            verticalHorizontal = int(
+                input("Selecciona como quieres poner el barco: 1-horizontal, 2- vertical: "))
             if verticalHorizontal == 1 or verticalHorizontal == 2:
                 break
             print("Opción inválida")
@@ -195,7 +236,7 @@ def colocar_barcos_jugador(tablero, barcos):
             except ValueError:
                 print("Introduce una fila valida por favor")
                 continue
-                
+
             col_letra = input("Introduce Columna (A-J): ").upper()
             if verticalHorizontal == 1 and 0 <= fila < 10 and col_letra in letrasValidas:
                 if colocarBarcoSeleccionado(tablero, longBarcoSelec, fila, col_letra, verticalHorizontal):
@@ -208,7 +249,6 @@ def colocar_barcos_jugador(tablero, barcos):
 
     return tablero
 
-import copy
 
 def colocarBarcoSeleccionado(tablero, longBarcoSelec, fila, col_letra, verticalHorizontal):
     letras = "ABCDEFGHIJ"
@@ -234,6 +274,7 @@ def colocarBarcoSeleccionado(tablero, longBarcoSelec, fila, col_letra, verticalH
         exit()
 
     return True
+
 
 def juego():
     """Bucle que dirige el programa de todo el juego"""
