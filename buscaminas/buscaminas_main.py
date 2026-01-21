@@ -112,3 +112,12 @@ def mostrar_tablero(tablero):
     for fila in tablero:
         print(" ".join(fila))
     print()
+
+
+def comprobar_victoria(tablero_visible, tablero_real):
+    tamaño = len(tablero_real)
+    for i in range(tamaño):
+        for j in range(tamaño):
+            if tablero_real[i][j] != "M" and tablero_visible[i][j] == "-":
+                return False
+    return True
