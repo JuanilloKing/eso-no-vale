@@ -2,9 +2,10 @@ import copy
 import sys
 import random
 # TODO: Cuando te equivocas al disparar, que te deje volver a disprar
-# TODO: Cambiar la 'X' de impacto del rival, por emojis
 # TODO: Cuando destruyes un barco, que te lo haga saber
-# TODO: mejorar la visibilidad en la colocación de barcos
+# TODO: Cuando el bot da en una zona bombardeada, que no pierda turno, sino que vuelva a tirar
+
+# TODO: el uso de emojis descuadra el tablero
 tamano_tablero = 10
 barcos = {
     "Portaaviones": 5,
@@ -47,8 +48,10 @@ def mostrar_tablero_consola(matriz, nombre_tablero):
                 visual_fila.append('H')
             elif casilla == 'N':
                 visual_fila.append('N')
-            else:
+            elif casilla == '~':
                 visual_fila.append('.')
+            else:
+                visual_fila.append(casilla)
 
         contenido_fila = " ".join(visual_fila)
         print(f"{etiqueta_fila}{contenido_fila}")
@@ -144,11 +147,12 @@ def colocar_barcos_aleatorios(tablero, barcos_a_colocar):
 
 
 def colocar_barcos_jugador(tablero, barcos):
+    letras = "ABCDEFGHIJ"
     barcos_a_colocar = barcos.copy()
     mostrar_tablero_consola(tablero, "Tu tablero actual")
     print(f"A CONTINUACIÓN DEBERÁS COLOCAR TUS BARCOS EN EL TABLERO")
     while not barcos_a_colocar == {}:
-
+        print("")
         print("Estos son los barcos que te quedan por colocar:")
         i = 1
         for nombre, longitud in barcos.items():  # Itera TODOS los barcos en orden fijo
@@ -162,6 +166,7 @@ def colocar_barcos_jugador(tablero, barcos):
         except ValueError:
             print("Introduce una opción válida")
             continue
+        print("")
 
         match opcion:
             case 1:
@@ -221,8 +226,12 @@ def colocar_barcos_jugador(tablero, barcos):
         print(
             f"Barco seleccionado: {nombreBarcoSelec}, longitud: {longBarcoSelec}")
         while True:
-            verticalHorizontal = int(
-                input("Selecciona como quieres poner el barco: 1-horizontal, 2- vertical: "))
+            try:
+                verticalHorizontal = int(input("Selecciona como quieres poner el barco: 1-horizontal, 2- vertical: "))
+            except ValueError:
+                print("Introduce un valor válido por favor.")
+                continue
+            print("")
             if verticalHorizontal == 1 or verticalHorizontal == 2:
                 break
             print("Opción inválida")
@@ -238,19 +247,21 @@ def colocar_barcos_jugador(tablero, barcos):
                 continue
 
             col_letra = input("Introduce Columna (A-J): ").upper()
+            print("")
             if verticalHorizontal == 1 and 0 <= fila < 10 and col_letra in letrasValidas:
-                if colocarBarcoSeleccionado(tablero, longBarcoSelec, fila, col_letra, verticalHorizontal):
+                if colocarBarcoSeleccionado(tablero, longBarcoSelec, fila, col_letra, verticalHorizontal, opcion):
                     break  # salió bien
-            elif verticalHorizontal == 2 and 0 <= fila < 11-longBarcoSelec and col_letra in letrasValidas:
-                if colocarBarcoSeleccionado(tablero, longBarcoSelec, fila, col_letra, verticalHorizontal):
+            elif verticalHorizontal == 2 and 0 <= fila < 11-longBarcoSelec and col_letra in letras:
+                if colocarBarcoSeleccionado(tablero, longBarcoSelec, fila, col_letra, verticalHorizontal,opcion):
                     break  # salió bien
             print("Casilla inválida o el barco no cabe en el tablero")
+            print("")
         mostrar_tablero_consola(tablero, "Tu tablero actual")
 
     return tablero
 
 
-def colocarBarcoSeleccionado(tablero, longBarcoSelec, fila, col_letra, verticalHorizontal):
+def colocarBarcoSeleccionado(tablero, longBarcoSelec, fila, col_letra, verticalHorizontal, opcion):
     letras = "ABCDEFGHIJ"
     columna = letras.index(col_letra)
 
@@ -271,6 +282,7 @@ def colocarBarcoSeleccionado(tablero, longBarcoSelec, fila, col_letra, verticalH
             tablero[fila + i][columna] = "B"
     else:
         print("Ha ocurrido un error")
+        print("")
         exit()
 
     return True
