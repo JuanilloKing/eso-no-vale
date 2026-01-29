@@ -1,7 +1,6 @@
 import copy
 import sys
 import random
-# TODO: Cuando te equivocas al disparar, que te deje volver a disprar
 # TODO: Cambiar la 'X' de impacto del rival, por emojis
 # TODO: Cuando destruyes un barco, que te lo haga saber
 # TODO: mejorar la visibilidad en la colocación de barcos
@@ -60,7 +59,7 @@ def mostrar_ambos_tableros(matriz_ataque, matriz_defensa, nombre):
     """
     tamano = len(matriz_ataque)
     letras = [chr(65 + i) for i in range(tamano)]
-    separador = "       "
+    separador = "        "
 
     print(f"\n{' ' * 5}radar de ataque (Rival){' ' * 15}barcos de {nombre} (Defensa)")
 
@@ -298,34 +297,41 @@ def juego():
         mostrar_ambos_tableros(tablero_jugador_ataque, tablero_jugador, nombre)
         print(f"\n--- TURNO {turno} ---")
 
-        turno += 1
+        # MODIFICACIÓN SOLICITADA: Bucle para permitir repetir disparo
+        disparo_valido = False
+        while not disparo_valido:
+            try:
+                fila = int(input("Introduce Fila (1-10): ")) - 1
+                col_letra = input("Introduce Columna (A-J): ").upper()
+                letras = 'ABCDEFGHIJ'
 
-        try:
-            fila = int(input("Introduce Fila (1-10): ")) - 1
-            col_letra = input("Introduce Columna (A-J): ").upper()
-            letras = 'ABCDEFGHIJ'
+                if 0 <= fila < 10 and col_letra in letras:
+                    for i in range(len(letras)):
+                        if letras[i] == col_letra:
+                            col = i
+                    celda_objetivo = tablero_maquina_oculto[fila][col]
 
-            if 0 <= fila < 10 and col_letra in letras:
-                for i in range(len(letras)):
-                    if letras[i] == col_letra:
-                        col = i
-                celda_objetivo = tablero_maquina_oculto[fila][col]
-
-                if celda_objetivo == 'B':
-                    print("¡¡IMPACTO!! Le has dado a un barco enemigo.")
-                    tablero_maquina_oculto[fila][col] = 'H'
-                    tablero_jugador_ataque[fila][col] = 'H'
-                elif celda_objetivo == '~':
-                    print("¡Agua! No has dado a nada.")
-                    tablero_maquina_oculto[fila][col] = 'N'
-                    tablero_jugador_ataque[fila][col] = 'N'
+                    if celda_objetivo == 'B':
+                        print("¡¡IMPACTO!! Le has dado a un barco enemigo.")
+                        tablero_maquina_oculto[fila][col] = 'H'
+                        tablero_jugador_ataque[fila][col] = 'H'
+                        disparo_valido = True
+                    elif celda_objetivo == '~':
+                        print("¡Agua! No has dado a nada.")
+                        tablero_maquina_oculto[fila][col] = 'N'
+                        tablero_jugador_ataque[fila][col] = 'N'
+                        disparo_valido = True
+                    else:
+                        print("Pierdes el turno, disparaste a una casilla ya bombardeada.")
+                        print("Vuelve a intentarlo.")
                 else:
-                    print("Pierdes el turno, disparaste a una casilla ya bombardeada.")
-            else:
-                print("Coordenadas fuera de rango. Vuelve a intentarlo")
+                    print("Coordenadas fuera de rango. Vuelve a intentarlo")
 
-        except ValueError:
-            print("Entrada no válida. Vuelve a intentarlo.")
+            except ValueError:
+                print("Entrada no válida. Vuelve a intentarlo.")
+
+        if not esta_vivo(tablero_maquina_oculto):
+            break
 
         print("\n--- TURNO DE LA MÁQUINA ---")
         f_maq = random.randint(0, 9)
@@ -341,6 +347,8 @@ def juego():
                 f"La máquina ha disparado en {f_maq+1}{chr(c_maq+65)} y... ha fallado.")
         else:
             print("La máquina ha disparado a una zona ya bombardeada.")
+            
+        turno += 1
 
     print("-" * 50)
     if esta_vivo(tablero_jugador):
