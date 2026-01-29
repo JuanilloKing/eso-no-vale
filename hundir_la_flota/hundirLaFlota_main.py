@@ -1,7 +1,6 @@
 import copy
 import sys
 import random
-# TODO: Cuando destruyes un barco, que te lo haga saber
 tamano_tablero = 10
 barcos = {
     "Portaaviones": 5,
@@ -38,7 +37,7 @@ def mostrar_tablero_consola(matriz, nombre_tablero):
         for casilla in fila:
             if casilla == 'A':
                 visual_fila.append('A')
-            elif casilla == 'B':
+            elif isinstance(casilla, str) and casilla.startswith('B'):
                 visual_fila.append('B')
             elif casilla == 'H':
                 visual_fila.append('💥')
@@ -77,7 +76,7 @@ def mostrar_ambos_tableros(matriz_ataque, matriz_defensa, nombre):
 
         fila_defensa = []
         for casilla in matriz_defensa[i]:
-            if casilla == 'B':
+            if isinstance(casilla, str) and casilla.startswith('B'):
                 fila_defensa.append('B')
             elif casilla == 'H':
                 fila_defensa.append('💥')
@@ -99,7 +98,7 @@ def esta_vivo(matriz):
     """
     for fila in matriz:
         for casilla in fila:
-            if casilla == 'B':
+            if isinstance(casilla, str) and casilla.startswith('B'):
                 return True
     return False
 
@@ -126,7 +125,7 @@ def colocar_barcos_aleatorios(tablero, barcos_a_colocar):
                 r = fila + (i if orientacion == 1 else 0)
                 c = columna + (i if orientacion == 0 else 0)
 
-                if tablero[r][c] == 'B':
+                if isinstance(tablero[r][c], str) and tablero[r][c].startswith('B'):
                     es_valido = False
                     break
 
@@ -134,7 +133,7 @@ def colocar_barcos_aleatorios(tablero, barcos_a_colocar):
                 for i in range(longitud):
                     r = fila + (i if orientacion == 1 else 0)
                     c = columna + (i if orientacion == 0 else 0)
-                    tablero[r][c] = 'B'
+                    tablero[r][c] = f"B_{nombre}"
                 colocado = True
 
     return tablero
@@ -143,89 +142,113 @@ def colocar_barcos_aleatorios(tablero, barcos_a_colocar):
 def colocar_barcos_jugador(tablero, barcos):
     barcos_a_colocar = barcos.copy()
     
-    print(f"\n--- FASE DE DESPLIEGUE NAVAL ---")
+    print(f"\n--- FASE DE COLOCACIÓN DE FLOTA ---")
     
     while not barcos_a_colocar == {}:
-        mostrar_tablero_consola(tablero, "Tu flota")
-        print("\nBarcos disponibles para colocar:")
+        mostrar_tablero_consola(tablero, "Tu tablero actual")
+        print("\nBarcos pendientes:")
         i = 1
         for nombre, longitud in barcos.items():
             if nombre in barcos_a_colocar:
-                print(f"{i}- {nombre} (Tamaño: {longitud})")
+                print(f"{i}- Barco: {nombre}, longitud: {longitud}")
             i += 1
 
         try:
-            opcion = int(input("\nSelecciona el número del barco: "))
+            opcion = int(
+                input("\nSelecciona un número de barco: "))
         except ValueError:
-            print("Error: Introduce un número válido.")
+            print("Introduce una opción válida")
             continue
 
         match opcion:
             case 1:
                 if "Portaaviones" in barcos_a_colocar:
                     nombreBarcoSelec, longBarcoSelec, letrasValidas = "Portaaviones", 5, "ABCDEF"
-                else: print("Ese barco ya está en el agua."); continue
+                else:
+                    print("¡Ya has colocado ese barco!")
+                    continue
             case 2:
                 if "Acorazado" in barcos_a_colocar:
                     nombreBarcoSelec, longBarcoSelec, letrasValidas = "Acorazado", 4, "ABCDEFG"
-                else: print("Ese barco ya está en el agua."); continue
+                else:
+                    print("¡Ya has colocado ese barco!")
+                    continue
             case 3:
                 if "Submarino" in barcos_a_colocar:
                     nombreBarcoSelec, longBarcoSelec, letrasValidas = "Submarino", 3, "ABCDEFGH"
-                else: print("Ese barco ya está en el agua."); continue
+                else:
+                    print("¡Ya has colocado ese barco!")
+                    continue
             case 4:
                 if "Destructor" in barcos_a_colocar:
                     nombreBarcoSelec, longBarcoSelec, letrasValidas = "Destructor", 3, "ABCDEFGH"
-                else: print("Ese barco ya está en el agua."); continue
+                else:
+                    print("¡Ya has colocado ese barco!")
+                    continue
             case 5:
                 if "Lancha" in barcos_a_colocar:
                     nombreBarcoSelec, longBarcoSelec, letrasValidas = "Lancha", 2, "ABCDEFGHI"
-                else: print("Ese barco ya está en el agua."); continue
+                else:
+                    print("¡Ya has colocado ese barco!")
+                    continue
             case _:
-                print("Opción no válida."); continue
+                print("Por favor, introduce una opción válida")
+                continue
 
-        print(f"\nColocando {nombreBarcoSelec}...")
+        print(f"\nConfigurando {nombreBarcoSelec} (Tamaño: {longBarcoSelec})")
         while True:
             try:
-                verticalHorizontal = int(input("Orientación (1-Horizontal, 2-Vertical): "))
-                if verticalHorizontal not in [1, 2]: raise ValueError
+                verticalHorizontal = int(
+                    input("1-horizontal, 2- vertical: "))
+                if verticalHorizontal not in [1, 2]:
+                    print("Opción inválida")
+                    continue
                 
-                fila = int(input("Fila inicial (1-10): ")) - 1
-                col_letra = input("Columna inicial (A-J): ").upper()
+                fila = int(input("Introduce Fila inicial (1-10): ")) - 1
+                col_letra = input("Introduce Columna inicial (A-J): ").upper()
                 
                 if verticalHorizontal == 1 and 0 <= fila < 10 and col_letra in letrasValidas:
-                    if colocarBarcoSeleccionado(tablero, longBarcoSelec, fila, col_letra, verticalHorizontal):
+                    if colocarBarcoSeleccionado(tablero, longBarcoSelec, fila, col_letra, verticalHorizontal, nombreBarcoSelec):
                         barcos_a_colocar.pop(nombreBarcoSelec)
                         break
                 elif verticalHorizontal == 2 and 0 <= fila < 11-longBarcoSelec and col_letra in "ABCDEFGHIJ":
-                    if colocarBarcoSeleccionado(tablero, longBarcoSelec, fila, col_letra, verticalHorizontal):
+                    if colocarBarcoSeleccionado(tablero, longBarcoSelec, fila, col_letra, verticalHorizontal, nombreBarcoSelec):
                         barcos_a_colocar.pop(nombreBarcoSelec)
                         break
-                print("Error: El barco no cabe o choca con otro. Inténtalo de nuevo.")
+                print("El barco no cabe o colisiona. Intenta otra posición.")
             except ValueError:
-                print("Error: Datos de entrada incorrectos.")
+                print("Entrada inválida. Reintenta la configuración del barco.")
 
-    print("\n¡Toda la flota ha sido desplegada con éxito!")
+    mostrar_tablero_consola(tablero, "Flota Desplegada")
     return tablero
 
 
-def colocarBarcoSeleccionado(tablero, longBarcoSelec, fila, col_letra, verticalHorizontal):
+def colocarBarcoSeleccionado(tablero, longBarcoSelec, fila, col_letra, verticalHorizontal, nombreBarco):
     letras = "ABCDEFGHIJ"
     columna = letras.index(col_letra)
 
-    if verticalHorizontal == 1:  # horizontal
+    if verticalHorizontal == 1:
         for i in range(longBarcoSelec):
-            if tablero[fila][columna + i] == "B":
+            if isinstance(tablero[fila][columna + i], str) and tablero[fila][columna + i].startswith('B'):
+                print("El barco colisiona con otro")
                 return False
         for i in range(longBarcoSelec):
-            tablero[fila][columna + i] = "B"
+            tablero[fila][columna + i] = f"B_{nombreBarco}"
 
-    elif verticalHorizontal == 2:  # vertical
+    elif verticalHorizontal == 2:
         for i in range(longBarcoSelec):
-            if tablero[fila + i][columna] == "B":
+            if isinstance(tablero[fila + i][columna], str) and tablero[fila + i][columna].startswith('B'):
+                print("El barco colisiona con otro")
                 return False
         for i in range(longBarcoSelec):
-            tablero[fila + i][columna] = "B"
+            tablero[fila + i][columna] = f"B_{nombreBarco}"
+    return True
+
+
+def verificar_hundido(tablero, identificador):
+    for fila in tablero:
+        if identificador in fila:
+            return False
     return True
 
 
@@ -262,10 +285,16 @@ def juego():
                     col = letras.index(col_letra)
                     celda_objetivo = tablero_maquina_oculto[fila][col]
 
-                    if celda_objetivo == 'B':
+                    if isinstance(celda_objetivo, str) and celda_objetivo.startswith('B_'):
                         print("¡¡IMPACTO!! Le has dado a un barco enemigo.")
+                        id_barco = celda_objetivo
                         tablero_maquina_oculto[fila][col] = 'H'
                         tablero_jugador_ataque[fila][col] = 'H'
+                        
+                        if verificar_hundido(tablero_maquina_oculto, id_barco):
+                            nombre_barco = id_barco.split('_')[1]
+                            print(f"¡EXCELENTE! Has hundido el {nombre_barco} enemigo.")
+                            
                         disparo_valido = True
                     elif celda_objetivo == '~':
                         print("¡Agua! No has dado a nada.")
@@ -273,12 +302,12 @@ def juego():
                         tablero_jugador_ataque[fila][col] = 'N'
                         disparo_valido = True
                     else:
-                        print("Ya disparaste ahí. Vuelve a intentarlo.")
+                        print("Ya bombardeaste esta casilla. Intenta otra.")
                 else:
-                    print("Coordenadas fuera de rango.")
+                    print("Coordenadas fuera de rango. Vuelve a intentarlo")
 
             except ValueError:
-                print("Entrada no válida.")
+                print("Entrada no válida. Vuelve a intentarlo.")
 
         if not esta_vivo(tablero_maquina_oculto):
             break
@@ -287,24 +316,29 @@ def juego():
         f_maq = random.randint(0, 9)
         c_maq = random.randint(0, 9)
 
-        if tablero_jugador[f_maq][c_maq] == 'B':
+        if isinstance(tablero_jugador[f_maq][c_maq], str) and tablero_jugador[f_maq][c_maq].startswith('B_'):
+            id_barco_jugador = tablero_jugador[f_maq][c_maq]
             tablero_jugador[f_maq][c_maq] = 'H'
-            print(f"La máquina ha disparado en {f_maq+1}{chr(c_maq+65)}: ¡IMPACTO!")
+            print(f"La máquina ha disparado en {f_maq+1}{chr(c_maq+65)} y... ¡TE HA DADO!")
+            if verificar_hundido(tablero_jugador, id_barco_jugador):
+                nombre_barco_jugador = id_barco_jugador.split('_')[1]
+                print(f"¡MALA SUERTE! La máquina ha hundido tu {nombre_barco_jugador}.")
         elif tablero_jugador[f_maq][c_maq] == '~':
             tablero_jugador[f_maq][c_maq] = 'N'
-            print(f"La máquina ha disparado en {f_maq+1}{chr(c_maq+65)}: Agua.")
+            print(f"La máquina ha disparado en {f_maq+1}{chr(c_maq+65)} y... ha fallado.")
             
         turno += 1
 
     print("-" * 50)
     if esta_vivo(tablero_jugador):
-        print(f"¡FELICIDADES {nombre}! Has ganado.")
+        print(f"¡FELICIDADES {nombre}! Has hundido toda la flota enemiga.")
     else:
-        print("¡GAME OVER! La máquina ha vencido.")
+        print("¡GAME OVER! La máquina ha hundido toda tu flota.")
     print("-" * 50)
 
 
 def mostrar_menu_inicial():
+    """Muestra el menú principal del juego Hundir la Flota."""
     print("🚢🌊 ¡HUNDIR LA FLOTA (Battleship)! 🌊🚢")
     print("-" * 35)
     print("1. Iniciar Nuevo Juego")
@@ -314,16 +348,19 @@ def mostrar_menu_inicial():
 
 
 def mostrar_reglas():
+    """Muestra las reglas básicas de Hundir la Flota."""
     print("\n📜 Reglas de Hundir la Flota 📜")
     print("---------------------------------")
-    print("- Coloca tus barcos y dispara por turnos.")
+    print("- El juego se juega en una cuadrícula.")
+    print("- Colocas tus barcos de forma secreta y disparas por turnos.")
     print("- 💥 = Impacto, 💧 = Agua.")
-    print("- Gana quien hunda todos los barcos rivales.")
+    print("- Gana el primero que hunda la flota enemiga.")
     print("---------------------------------")
-    input("\nPresiona Enter para volver...")
+    input("\nPresiona Enter para volver al menú...")
 
 
 def jugar():
+    """Función principal que maneja la navegación del menú."""
     while True:
         mostrar_menu_inicial()
         opcion = input("Elige una opción (1-3): ").strip()
@@ -333,6 +370,8 @@ def jugar():
             mostrar_reglas()
         elif opcion == '3':
             sys.exit()
+        else:
+            print("Opción no válida. Por favor, introduce 1, 2 o 3.")
 
 
 if __name__ == "__main__":
