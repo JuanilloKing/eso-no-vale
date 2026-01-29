@@ -1,7 +1,6 @@
 import copy
 import sys
 import random
-# TODO: Cambiar la 'X' de impacto del rival, por emojis
 # TODO: Cuando destruyes un barco, que te lo haga saber
 # TODO: mejorar la visibilidad en la colocación de barcos
 tamano_tablero = 10
