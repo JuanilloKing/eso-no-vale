@@ -109,8 +109,18 @@ def marcar_mina(tablero_visible, fila, columna):
 
     
 def mostrar_tablero(tablero):
-    for fila in tablero:
-        print(" ".join(fila))
+    tamaño = len(tablero)
+    ancho_fila = len(str(tamaño - 1))
+    
+    print(" " * (ancho_fila + 1), end="") 
+    
+    for col in range(tamaño):
+        print(f"{col:2}", end=" ") 
+    print() 
+    
+    for i, fila in enumerate(tablero):
+        print(f"{i:>{ancho_fila}} |", end=" ") 
+        print(" ".join(f"{celda:2}" for celda in fila))
     print()
 
 
