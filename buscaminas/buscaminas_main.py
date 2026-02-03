@@ -27,8 +27,19 @@ def jugar():
             print("Acción no válida.")
             continue
         
-        fila = int(input("Ingresa la fila: "))
-        columna = int(input("Ingresa la columna: "))
+        # VALIDACIÓN AÑADIDA
+        try:
+            fila = int(input(f"Ingresa la fila (0-{tamaño-1}): "))
+            columna = int(input(f"Ingresa la columna (0-{tamaño-1}): "))
+            
+            # Validar que estén dentro del rango
+            if fila < 0 or fila >= tamaño or columna < 0 or columna >= tamaño:
+                print(f"❌ Coordenadas fuera de rango. Usa valores entre 0 y {tamaño-1}.")
+                continue
+                
+        except ValueError:
+            print("❌ Por favor, ingresa números válidos.")
+            continue
 
         if accion == "d":
             if tablero_real[fila][columna] == "M":
