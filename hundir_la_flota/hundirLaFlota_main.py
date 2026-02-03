@@ -1,11 +1,9 @@
 import copy
 import sys
 import random
-# TODO: Cuando te equivocas al disparar, que te deje volver a disprar
-# TODO: Cuando destruyes un barco, que te lo haga saber
-# TODO: Cuando el bot da en una zona bombardeada, que no pierda turno, sino que vuelva a tirar
-
-# TODO: el uso de emojis descuadra el tablero
+# TODO: Añadir el nombre de los barcos en las instrucciones
+# TODO: El bot no puede ganar la partida (quizas no se actualiza el tablero suyo real)
+ 
 tamano_tablero = 10
 barcos = {
     "Portaaviones": 5,
@@ -15,8 +13,9 @@ barcos = {
     "Lancha": 2
 }
 
-letrasBarcos = "PCSDL" # Las iniciales de los barcos (excepto el acorazado que es una c debido a que la letra A ya esta usada)
-golpes_a_cada_barco = [0,0,0,0,0]
+# Las iniciales de los barcos (excepto el acorazado que es una c debido a que la letra A ya esta usada)
+letrasBarcos = "PCSDL"
+golpes_a_cada_barco = [0, 0, 0, 0, 0]
 
 
 def crear_matriz_base(tamano):
@@ -86,8 +85,8 @@ def mostrar_ambos_tableros(matriz_ataque, matriz_defensa, nombre):
 
         fila_defensa = []
         for casilla in matriz_defensa[i]:
-            if casilla == 'B':
-                fila_defensa.append('B')
+            if casilla in letrasBarcos:
+                fila_defensa.append(casilla)
             elif casilla == 'H':
                 fila_defensa.append('X')
             elif casilla == 'N':
@@ -108,17 +107,18 @@ def esta_vivo(matriz):
     """
     for fila in matriz:
         for casilla in fila:
-            if casilla == 'B':
+            if casilla in letrasBarcos or 'B':
                 return True
     return False
 
 
 def colocar_barcos_aleatorios(tablero, barcos_a_colocar):
     """Coloca los barcos en el tablero de forma aleatoria."""
-
+    cont = 0
     tamano = len(tablero)
 
     for nombre, longitud in barcos_a_colocar.items():
+
         colocado = False
         while not colocado:
             orientacion = random.randint(0, 1)
@@ -143,9 +143,9 @@ def colocar_barcos_aleatorios(tablero, barcos_a_colocar):
                 for i in range(longitud):
                     r = fila + (i if orientacion == 1 else 0)
                     c = columna + (i if orientacion == 0 else 0)
-                    tablero[r][c] = 'B'
+                    tablero[r][c] = letrasBarcos[cont]
+                cont += 1
                 colocado = True
-
     return tablero
 
 
@@ -230,7 +230,8 @@ def colocar_barcos_jugador(tablero, barcos):
             f"Barco seleccionado: {nombreBarcoSelec}, longitud: {longBarcoSelec}")
         while True:
             try:
-                verticalHorizontal = int(input("Selecciona como quieres poner el barco: 1-horizontal, 2- vertical: "))
+                verticalHorizontal = int(
+                    input("Selecciona como quieres poner el barco: 1-horizontal, 2- vertical: "))
             except ValueError:
                 print("Introduce un valor válido por favor.")
                 continue
@@ -255,7 +256,7 @@ def colocar_barcos_jugador(tablero, barcos):
                 if colocarBarcoSeleccionado(tablero, longBarcoSelec, fila, col_letra, verticalHorizontal, opcion):
                     break  # salió bien
             elif verticalHorizontal == 2 and 0 <= fila < 11-longBarcoSelec and col_letra in letras:
-                if colocarBarcoSeleccionado(tablero, longBarcoSelec, fila, col_letra, verticalHorizontal,opcion):
+                if colocarBarcoSeleccionado(tablero, longBarcoSelec, fila, col_letra, verticalHorizontal, opcion):
                     break  # salió bien
             print("Casilla inválida o el barco no cabe en el tablero")
             print("")
@@ -316,78 +317,102 @@ def juego():
         turno += 1
 
         try:
-            #Introducción de la casilla a atacar
-            fila = int(input("Introduce Fila (1-10): ")) - 1
-            col_letra = input("Introduce Columna (A-J): ").upper()
-            letras = 'ABCDEFGHIJ'
+            fallar = True
+            while fallar:
+                # Introducción de la casilla a atacar
+                fila = int(input("Introduce Fila (1-10): ")) - 1
+                col_letra = input("Introduce Columna (A-J): ").upper()
+                letras = 'ABCDEFGHIJ'
 
-            #Comprobación del rango de la casilla introducida
-            if 0 <= fila < 10 and col_letra in letras:
-                for i in range(len(letras)):
-                    if letras[i] == col_letra:
-                        col = i
-                celda_objetivo = tablero_maquina_oculto[fila][col]
+                # Comprobación del rango de la casilla introducida
+                if 0 <= fila < 10 and col_letra in letras:
+                    for i in range(len(letras)):
+                        if letras[i] == col_letra:
+                            col = i
+                    celda_objetivo = tablero_maquina_oculto[fila][col]
 
-                if celda_objetivo in letrasBarcos:
-                    if celda_objetivo == "P": #Portaaviones
-                        golpes_a_cada_barco[0] += 1 #Suma un golpe al contador correspondiente
-                        if golpes_a_cada_barco[0] >= 5: #Comprobar si se ha tumbado el barco completo
-                            print("¡¡TOCADO Y HUNDIDO!! Has derribado el portaaviones enemigo")
-                        else:
-                            print("¡¡IMPACTO!! Le has dado a un barco enemigo.")
-                    if celda_objetivo == "C": #Acorazado
-                        golpes_a_cada_barco[1] += 1 #Suma un golpe al contador correspondiente
-                        if golpes_a_cada_barco[1] >= 4: #Comprobar si se ha tumbado el barco completo
-                            print("¡¡TOCADO Y HUNDIDO!! Has derribado el acorazado enemigo")
-                        else:
-                            print("¡¡IMPACTO!! Le has dado a un barco enemigo.")
-                    if celda_objetivo == "S": #Submarino
-                        golpes_a_cada_barco[2] += 1 #Suma un golpe al contador correspondiente
-                        if golpes_a_cada_barco[2] >= 3: #Comprobar si se ha tumbado el barco completo
-                            print("¡¡TOCADO Y HUNDIDO!! Has derribado el submarino enemigo")
-                        else:
-                            print("¡¡IMPACTO!! Le has dado a un barco enemigo.")
-                    if celda_objetivo == "D": #Destructor
-                        golpes_a_cada_barco[3] += 1 #Suma un golpe al contador correspondiente
-                        if golpes_a_cada_barco[3] >= 3: #Comprobar si se ha tumbado el barco completo
-                            print("¡¡TOCADO Y HUNDIDO!! Has derribado el destructor enemigo")
-                        else:
-                            print("¡¡IMPACTO!! Le has dado a un barco enemigo.")
-                    if celda_objetivo == "L": #Lancha
-                        golpes_a_cada_barco[4] += 1 #Suma un golpe al contador correspondiente
-                        if golpes_a_cada_barco[4] >= 3: #Comprobar si se ha tumbado el barco completo
-                            print("¡¡TOCADO Y HUNDIDO!! Has derribado la lancha enemigo")
-                        else:
-                            print("¡¡IMPACTO!! Le has dado a un barco enemigo.")
-                    tablero_maquina_oculto[fila][col] = 'H'
-                    tablero_jugador_ataque[fila][col] = 'H'
+                    if celda_objetivo in letrasBarcos:
+                        if celda_objetivo == "P":  # Portaaviones
+                            # Suma un golpe al contador correspondiente
+                            golpes_a_cada_barco[0] += 1
+                            # Comprobar si se ha tumbado el barco completo
+                            if golpes_a_cada_barco[0] >= 5:
+                                print(
+                                    "¡¡TOCADO Y HUNDIDO!! Has derribado el portaaviones enemigo")
+                            else:
+                                print("¡¡IMPACTO!! Le has dado a un barco enemigo.")
+                        if celda_objetivo == "C":  # Acorazado
+                            # Suma un golpe al contador correspondiente
+                            golpes_a_cada_barco[1] += 1
+                            # Comprobar si se ha tumbado el barco completo
+                            if golpes_a_cada_barco[1] >= 4:
+                                print(
+                                    "¡¡TOCADO Y HUNDIDO!! Has derribado el acorazado enemigo")
+                            else:
+                                print("¡¡IMPACTO!! Le has dado a un barco enemigo.")
+                        if celda_objetivo == "S":  # Submarino
+                            # Suma un golpe al contador correspondiente
+                            golpes_a_cada_barco[2] += 1
+                            # Comprobar si se ha tumbado el barco completo
+                            if golpes_a_cada_barco[2] >= 3:
+                                print(
+                                    "¡¡TOCADO Y HUNDIDO!! Has derribado el submarino enemigo")
+                            else:
+                                print("¡¡IMPACTO!! Le has dado a un barco enemigo.")
+                        if celda_objetivo == "D":  # Destructor
+                            # Suma un golpe al contador correspondiente
+                            golpes_a_cada_barco[3] += 1
+                            # Comprobar si se ha tumbado el barco completo
+                            if golpes_a_cada_barco[3] >= 3:
+                                print(
+                                    "¡¡TOCADO Y HUNDIDO!! Has derribado el destructor enemigo")
+                            else:
+                                print("¡¡IMPACTO!! Le has dado a un barco enemigo.")
+                        if celda_objetivo == "L":  # Lancha
+                            # Suma un golpe al contador correspondiente
+                            golpes_a_cada_barco[4] += 1
+                            # Comprobar si se ha tumbado el barco completo
+                            if golpes_a_cada_barco[4] >= 3:
+                                print(
+                                    "¡¡TOCADO Y HUNDIDO!! Has derribado la lancha enemigo")
+                            else:
+                                print("¡¡IMPACTO!! Le has dado a un barco enemigo.")
+                        tablero_maquina_oculto[fila][col] = 'H'
+                        tablero_jugador_ataque[fila][col] = 'H'
+                        fallar = False
 
-                elif celda_objetivo == '~':
-                    print("¡Agua! No has dado a nada.")
-                    tablero_maquina_oculto[fila][col] = 'N'
-                    tablero_jugador_ataque[fila][col] = 'N'
+                    elif celda_objetivo == '~':
+                        print("¡Agua! No has dado a nada.")
+                        tablero_maquina_oculto[fila][col] = 'N'
+                        tablero_jugador_ataque[fila][col] = 'N'
+                        fallar = False
+                    else:
+                        print(
+                            "Disparaste a una casilla ya bombardeada. Intentalo de nuevo")
                 else:
-                    print("Pierdes el turno, disparaste a una casilla ya bombardeada.")
-            else:
-                print("Coordenadas fuera de rango. Vuelve a intentarlo")
+                    print("Coordenadas fuera de rango. Intentalo de nuevo")
 
         except ValueError:
             print("Entrada no válida. Vuelve a intentarlo.")
 
         print("\n--- TURNO DE LA MÁQUINA ---")
-        f_maq = random.randint(0, 9)
-        c_maq = random.randint(0, 9)
+        fallar = True
+        while fallar:
+            f_maq = random.randint(0, 9)
+            c_maq = random.randint(0, 9)
 
-        if tablero_jugador[f_maq][c_maq] == 'B':
-            tablero_jugador[f_maq][c_maq] = 'H'
-            print(
-                f"La máquina ha disparado en {f_maq+1}{chr(c_maq+65)} y... ¡TE HA DADO!")
-        elif tablero_jugador[f_maq][c_maq] == '~':
-            tablero_jugador[f_maq][c_maq] = 'N'
-            print(
-                f"La máquina ha disparado en {f_maq+1}{chr(c_maq+65)} y... ha fallado.")
-        else:
-            print("La máquina ha disparado a una zona ya bombardeada.")
+            if tablero_jugador[f_maq][c_maq] in letrasBarcos:
+                tablero_jugador[f_maq][c_maq] = 'H'
+                print(
+                    f"La máquina ha disparado en {f_maq+1}{chr(c_maq+66)} y... ¡TE HA DADO!")
+                fallar = False
+            elif tablero_jugador[f_maq][c_maq] == '~':
+                tablero_jugador[f_maq][c_maq] = 'N'
+                print(
+                    f"La máquina ha disparado en {f_maq+1}{chr(c_maq+66)} y... ha fallado.")
+                fallar = False
+            else:
+                continue
 
     print("-" * 50)
     if esta_vivo(tablero_jugador):
