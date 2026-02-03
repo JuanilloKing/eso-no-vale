@@ -1,4 +1,18 @@
 import random
+from colorama import Fore, Style, init
+
+COLORES = {
+    "0": Fore.WHITE,
+    "1": Fore.BLUE,
+    "2": Fore.GREEN,
+    "3": Fore.RED,
+    "4": Fore.MAGENTA,
+    "5": Fore.YELLOW, 
+    "6": Fore.CYAN, 
+    "7": Fore.WHITE, 
+    "8": Fore.LIGHTRED_EX, 
+    "M": Fore.LIGHTBLACK_EX
+}
 
 def jugar():
     print("¡Bienvenido a Buscaminas!")
@@ -131,7 +145,11 @@ def mostrar_tablero(tablero):
     
     for i, fila in enumerate(tablero):
         print(f"{i:>{ancho_fila}} |", end=" ") 
-        print(" ".join(f"{celda:2}" for celda in fila))
+        #print(" ".join(f"{celda:2}" for celda in fila))
+        for celda in fila:
+            color = COLORES.get(celda, Fore.WHITE)
+            print(f"{color}{celda:2}{Style.RESET_ALL}", end=" ")
+        print()
     print()
 
 
