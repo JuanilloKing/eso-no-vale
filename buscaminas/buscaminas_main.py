@@ -1,4 +1,18 @@
 import random
+from colorama import Fore, Style, init
+
+COLORES = {
+    "0": Fore.WHITE,
+    "1": Fore.BLUE,
+    "2": Fore.GREEN,
+    "3": Fore.RED,
+    "4": Fore.MAGENTA,
+    "5": Fore.YELLOW,
+    "6": Fore.CYAN,
+    "7": Fore.WHITE,
+    "8": Fore.LIGHTRED_EX,
+    "M": Fore.LIGHTBLACK_EX
+}
 
 def jugar():
     print("¡Bienvenido a Buscaminas!")
@@ -110,9 +124,9 @@ def marcar_mina(tablero_visible, fila, columna):
     
 def mostrar_tablero(tablero):
     for fila in tablero:
-        print(" ".join(fila))
-    print()
-
+        for celda in fila:
+            print(COLORES.get(celda, Fore.WHITE) + celda, end=" ")
+        print()
 
 def comprobar_victoria(tablero_visible, tablero_real):
     tamaño = len(tablero_real)
