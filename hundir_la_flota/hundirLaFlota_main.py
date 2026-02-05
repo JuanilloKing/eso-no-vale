@@ -1,7 +1,7 @@
-import copy
+
 import sys
 import random
-# TODO: Añadir el nombre de los barcos en las instrucciones
+
 # TODO: El bot no puede ganar la partida (quizas no se actualiza el tablero suyo real)
  
 tamano_tablero = 10
@@ -107,7 +107,7 @@ def esta_vivo(matriz):
     """
     for fila in matriz:
         for casilla in fila:
-            if casilla in letrasBarcos or 'B':
+            if casilla in letrasBarcos or casilla =='B':
                 return True
     return False
 
@@ -146,6 +146,7 @@ def colocar_barcos_aleatorios(tablero, barcos_a_colocar):
                     tablero[r][c] = letrasBarcos[cont]
                 cont += 1
                 colocado = True
+    mostrar_tablero_consola(tablero, "prueba")
     return tablero
 
 
@@ -299,12 +300,30 @@ def juego():
     nombre = input("Introduce tu nombre para jugar: ")
 
     tablero_maquina_oculto = crear_matriz_base(tamano_tablero)
-    tablero_maquina_oculto = colocar_barcos_aleatorios(
-        tablero_maquina_oculto, barcos)
+    tablero_maquina_oculto = colocar_barcos_aleatorios(tablero_maquina_oculto, barcos)
 
     tablero_jugador_ataque = crear_matriz_base(tamano_tablero)
     tablero_jugador = crear_matriz_base(tamano_tablero)
-    colocar_barcos_jugador(tablero_jugador, barcos)
+
+    while True:
+        try:
+            print("1- Colocar barcos manualmente")
+            print("2- Colocar barcos aleatoriamente")
+            respuesta = int (input("Selecciona una opcion: "))
+            
+            if respuesta == 1:
+                tablero_jugador = colocar_barcos_jugador(tablero_jugador, barcos)
+                break
+            elif respuesta == 2:
+                tablero_jugador = colocar_barcos_aleatorios(tablero_jugador, barcos)
+                break
+            else:
+                print("Introduce una opcion válida.")
+                continue
+        except ValueError:
+            print("Introduce una opcion válida.")
+            continue
+
 
     print("\nBarcos del rival colocados aleatoriamente.")
 
@@ -441,6 +460,13 @@ def mostrar_reglas():
     print("- Los jugadores se turnan para disparar a coordenadas específicas del enemigo.")
     print("- Si aciertas un barco, es un 'impacto'. Si fallas, es 'agua'.")
     print("- Gana el primer jugador que hunda todos los barcos del oponente.")
+    print("---------------------------------")
+    print("- Cada barco tiene asignada una letra con la que se mostrará en pantalla")
+    print("  1- Portaaviones: P")
+    print("  2- Acorazado: C")
+    print("  3- Submarino: S")
+    print("  4- Destructor: D")
+    print("  5- Lancha: L")
     print("---------------------------------")
     input("\nPresiona Enter para volver al menú...")
 
