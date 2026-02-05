@@ -1,9 +1,7 @@
 import copy
 import sys
 import random
-# TODO: Añadir el nombre de los barcos en las instrucciones
-# TODO: El bot no puede ganar la partida (quizas no se actualiza el tablero suyo real)
- 
+
 tamano_tablero = 10
 barcos = {
     "Portaaviones": 5,
@@ -69,7 +67,7 @@ def mostrar_ambos_tableros(matriz_ataque, matriz_defensa, nombre):
 
     print(f"\n{' ' * 5}radar de ataque (Rival){' ' * 15}barcos de {nombre} (Defensa)")
 
-    cabecera_letras = "    " + " ".join(letras)
+    cabecera_letras = "     " + " ".join(letras)
     print(cabecera_letras + separador + cabecera_letras)
     print("    " + "-" * (tamano * 2) + separador + "    " + "-" * (tamano * 2))
 
@@ -107,7 +105,7 @@ def esta_vivo(matriz):
     """
     for fila in matriz:
         for casilla in fila:
-            if casilla in letrasBarcos or 'B':
+            if casilla in letrasBarcos or casilla == 'B':
                 return True
     return False
 
@@ -404,12 +402,12 @@ def juego():
             if tablero_jugador[f_maq][c_maq] in letrasBarcos:
                 tablero_jugador[f_maq][c_maq] = 'H'
                 print(
-                    f"La máquina ha disparado en {f_maq+1}{chr(c_maq+66)} y... ¡TE HA DADO!")
+                    f"La máquina ha disparado en {f_maq+1}{chr(c_maq+65)} y... ¡TE HA DADO!")
                 fallar = False
             elif tablero_jugador[f_maq][c_maq] == '~':
                 tablero_jugador[f_maq][c_maq] = 'N'
                 print(
-                    f"La máquina ha disparado en {f_maq+1}{chr(c_maq+66)} y... ha fallado.")
+                    f"La máquina ha disparado en {f_maq+1}{chr(c_maq+65)} y... ha fallado.")
                 fallar = False
             else:
                 continue
