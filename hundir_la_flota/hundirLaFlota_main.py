@@ -1,4 +1,4 @@
-import copy
+
 import sys
 import random
 
@@ -302,7 +302,27 @@ def juego():
 
     tablero_jugador_ataque = crear_matriz_base(tamano_tablero)
     tablero_jugador = crear_matriz_base(tamano_tablero)
-    colocar_barcos_jugador(tablero_jugador, barcos)
+
+    while True:
+        try:
+            print("1- Colocar barcos manualmente")
+            print("2- Colocar barcos aleatoriamente")
+            respuesta = int(input("Selecciona una opcion: "))
+
+            if respuesta == 1:
+                tablero_jugador = colocar_barcos_jugador(
+                    tablero_jugador, barcos)
+                break
+            elif respuesta == 2:
+                tablero_jugador = colocar_barcos_aleatorios(
+                    tablero_jugador, barcos)
+                break
+            else:
+                print("Introduce una opcion válida.")
+                continue
+        except ValueError:
+            print("Introduce una opcion válida.")
+            continue
 
     print("\nBarcos del rival colocados aleatoriamente.")
 
@@ -439,6 +459,13 @@ def mostrar_reglas():
     print("- Los jugadores se turnan para disparar a coordenadas específicas del enemigo.")
     print("- Si aciertas un barco, es un 'impacto'. Si fallas, es 'agua'.")
     print("- Gana el primer jugador que hunda todos los barcos del oponente.")
+    print("---------------------------------")
+    print("- Cada barco tiene asignada una letra con la que se mostrará en pantalla")
+    print("  1- Portaaviones: P")
+    print("  2- Acorazado: C")
+    print("  3- Submarino: S")
+    print("  4- Destructor: D")
+    print("  5- Lancha: L")
     print("---------------------------------")
     input("\nPresiona Enter para volver al menú...")
 
