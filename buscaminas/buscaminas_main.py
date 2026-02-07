@@ -19,8 +19,18 @@ def jugar():
     print("[1] Fácil")
     print("[2] Medio")
     print("[3] Difícil")
-    dificultad = int(input("Selecciona la dificultad: "))
-    
+    while True:
+        try:
+            entrada = input("Selecciona la dificultad (1-3): ")
+            dificultad = int(entrada)
+            
+            if 1 <= dificultad <= 3:
+                break 
+            else:
+                print("⚠️  Opción incorrecta. Por favor, elige 1, 2 o 3.")
+        except ValueError:
+            print("⚠️  Entrada no válida. Por favor, introduce un número.")
+                
     minas = generarMinas(dificultad)
     
     tablero_real = generar_tablero(dificultad, minas)
@@ -41,12 +51,11 @@ def jugar():
             print("Acción no válida.")
             continue
         
-        # VALIDACIÓN AÑADIDA
+        
         try:
             fila = int(input(f"Ingresa la fila (0-{tamaño-1}): "))
             columna = int(input(f"Ingresa la columna (0-{tamaño-1}): "))
             
-            # Validar que estén dentro del rango
             if fila < 0 or fila >= tamaño or columna < 0 or columna >= tamaño:
                 print(f"❌ Coordenadas fuera de rango. Usa valores entre 0 y {tamaño-1}.")
                 continue
