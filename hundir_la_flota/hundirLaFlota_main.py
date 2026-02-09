@@ -1,4 +1,3 @@
-
 import sys
 import random
 
@@ -133,7 +132,7 @@ def colocar_barcos_aleatorios(tablero, barcos_a_colocar):
                 r = fila + (i if orientacion == 1 else 0)
                 c = columna + (i if orientacion == 0 else 0)
 
-                if tablero[r][c] == 'B':
+                if tablero[r][c] in letrasBarcos:
                     es_valido = False
                     break
 
@@ -290,6 +289,58 @@ def colocarBarcoSeleccionado(tablero, longBarcoSelec, fila, col_letra, verticalH
     return True
 
 
+def es_disparable(tablero, f, c):
+    return tablero[f][c] == '~' or tablero[f][c] in letrasBarcos
+
+
+def obtener_vecinos(f, c, tamano):
+    vecinos = []
+    if f - 1 >= 0:
+        vecinos.append((f - 1, c))
+    if f + 1 < tamano:
+        vecinos.append((f + 1, c))
+    if c - 1 >= 0:
+        vecinos.append((f, c - 1))
+    if c + 1 < tamano:
+        vecinos.append((f, c + 1))
+    return vecinos
+
+
+def reiniciar_memoria(memoria):
+    memoria["modo"] = "caza"
+    memoria["primero"] = None
+    memoria["ultimo"] = None
+    memoria["dir"] = None
+    memoria["pendientes"] = []
+    memoria["dir_invertida"] = False
+
+
+def elegir_disparo_maquina(tablero, memoria):
+    tamano = len(tablero)
+
+    if memoria["modo"] == "objetivo":
+        # seguir dirección fija si existe
+        if memoria["dir"] is not None and memoria["ultimo"] is not None:
+            df, dc = memoria["dir"]
+            f, c = memoria["ultimo"]
+            nf, nc = f + df, c + dc
+            if 0 <= nf < tamano and 0 <= nc < tamano and es_disparable(tablero, nf, nc):
+                return nf, nc
+
+        # probar vecinos pendientes
+        while memoria["pendientes"]:
+            f, c = memoria["pendientes"].pop(0)
+            if es_disparable(tablero, f, c):
+                return f, c
+
+    # modo búsqueda aleatoria
+    while True:
+        f = random.randint(0, tamano - 1)
+        c = random.randint(0, tamano - 1)
+        if es_disparable(tablero, f, c):
+            return f, c
+
+
 def juego():
     """Bucle que dirige el programa de todo el juego"""
     print("-" * 50)
@@ -328,6 +379,9 @@ def juego():
 
     print("-" * 50)
     turno = 1
+    memoria_maquina = {}
+    reiniciar_memoria(memoria_maquina)
+
     while esta_vivo(tablero_maquina_oculto) and esta_vivo(tablero_jugador):
         mostrar_ambos_tableros(tablero_jugador_ataque, tablero_jugador, nombre)
         print(f"\n--- TURNO {turno} ---")
@@ -416,21 +470,52 @@ def juego():
         print("\n--- TURNO DE LA MÁQUINA ---")
         fallar = True
         while fallar:
-            f_maq = random.randint(0, 9)
-            c_maq = random.randint(0, 9)
+            f_maq, c_maq = elegir_disparo_maquina(
+                tablero_jugador, memoria_maquina)
 
             if tablero_jugador[f_maq][c_maq] in letrasBarcos:
                 tablero_jugador[f_maq][c_maq] = 'H'
                 print(
                     f"La máquina ha disparado en {f_maq+1}{chr(c_maq+65)} y... ¡TE HA DADO!")
                 fallar = False
+
+                if memoria_maquina["modo"] == "caza":
+                    memoria_maquina["modo"] = "objetivo"
+                    memoria_maquina["primero"] = (f_maq, c_maq)
+                    memoria_maquina["ultimo"] = (f_maq, c_maq)
+                    memoria_maquina["dir"] = None
+                    memoria_maquina["dir_invertida"] = False
+                    memoria_maquina["pendientes"] = obtener_vecinos(
+                        f_maq, c_maq, tamano_tablero)
+                else:
+                    # fijar dirección si aún no existe
+                    if memoria_maquina["dir"] is None and memoria_maquina["primero"] is not None:
+                        pf, pc = memoria_maquina["primero"]
+                        df = f_maq - pf
+                        dc = c_maq - pc
+                        if (df, dc) in [(1, 0), (-1, 0), (0, 1), (0, -1)]:
+                            memoria_maquina["dir"] = (df, dc)
+                            memoria_maquina["dir_invertida"] = False
+                    memoria_maquina["ultimo"] = (f_maq, c_maq)
+
             elif tablero_jugador[f_maq][c_maq] == '~':
                 tablero_jugador[f_maq][c_maq] = 'N'
                 print(
                     f"La máquina ha disparado en {f_maq+1}{chr(c_maq+65)} y... ha fallado.")
                 fallar = False
-            else:
-                continue
+
+                if memoria_maquina["modo"] == "objetivo":
+                    if memoria_maquina["dir"] is not None and memoria_maquina["primero"] is not None:
+                        if not memoria_maquina["dir_invertida"]:
+                            df, dc = memoria_maquina["dir"]
+                            memoria_maquina["dir"] = (-df, -dc)
+                            memoria_maquina["ultimo"] = memoria_maquina["primero"]
+                            memoria_maquina["dir_invertida"] = True
+                        else:
+                            reiniciar_memoria(memoria_maquina)
+                    else:
+                        if not memoria_maquina["pendientes"]:
+                            reiniciar_memoria(memoria_maquina)
 
     print("-" * 50)
     if esta_vivo(tablero_jugador):
