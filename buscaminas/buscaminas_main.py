@@ -120,7 +120,6 @@ def marcar_mina(tablero_visible, fila, columna):
         tablero_visible[fila][columna] = "⚑"
     elif tablero_visible[fila][columna] == "⚑":
         tablero_visible[fila][columna] = "-"
-
     
 def mostrar_tablero(tablero):
     for fila in tablero:
