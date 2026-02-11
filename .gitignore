@@ -1,3 +1,2 @@
-# generate automatic gitignore files for python
-__pycache__/
-../__pycache__
+**/__pycache__/
+**/__pycache__/**
