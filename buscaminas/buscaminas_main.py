@@ -168,4 +168,8 @@ def comprobar_victoria(tablero_visible, tablero_real):
         for j in range(tamaño):
             if tablero_real[i][j] != "M" and tablero_visible[i][j] == "-":
                 return False
+<<<<<<< HEAD
     return True
+=======
+    return True
+>>>>>>> origin/alejandro
