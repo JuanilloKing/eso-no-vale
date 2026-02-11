@@ -7,17 +7,10 @@ COLORES = {
     "2": Fore.GREEN,
     "3": Fore.RED,
     "4": Fore.MAGENTA,
-<<<<<<< HEAD
-    "5": Fore.YELLOW,
-    "6": Fore.CYAN,
-    "7": Fore.WHITE,
-    "8": Fore.LIGHTRED_EX,
-=======
     "5": Fore.YELLOW, 
     "6": Fore.CYAN, 
     "7": Fore.WHITE, 
     "8": Fore.LIGHTRED_EX, 
->>>>>>> lucas
     "M": Fore.LIGHTBLACK_EX
 }
 
@@ -149,12 +142,6 @@ def marcar_mina(tablero_visible, fila, columna):
         tablero_visible[fila][columna] = "-"
     
 def mostrar_tablero(tablero):
-<<<<<<< HEAD
-    for fila in tablero:
-        for celda in fila:
-            print(COLORES.get(celda, Fore.WHITE) + celda, end=" ")
-        print()
-=======
     tamaño = len(tablero)
     ancho_fila = len(str(tamaño - 1))
     
@@ -173,7 +160,6 @@ def mostrar_tablero(tablero):
         print()
     print()
 
->>>>>>> lucas
 
 def comprobar_victoria(tablero_visible, tablero_real):
     tamaño = len(tablero_real)
@@ -181,8 +167,4 @@ def comprobar_victoria(tablero_visible, tablero_real):
         for j in range(tamaño):
             if tablero_real[i][j] != "M" and tablero_visible[i][j] == "-":
                 return False
-<<<<<<< HEAD
     return True
-=======
-    return True
->>>>>>> origin/alejandro
