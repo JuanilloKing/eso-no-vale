@@ -7,10 +7,17 @@ COLORES = {
     "2": Fore.GREEN,
     "3": Fore.RED,
     "4": Fore.MAGENTA,
+<<<<<<< HEAD
     "5": Fore.YELLOW,
     "6": Fore.CYAN,
     "7": Fore.WHITE,
     "8": Fore.LIGHTRED_EX,
+=======
+    "5": Fore.YELLOW, 
+    "6": Fore.CYAN, 
+    "7": Fore.WHITE, 
+    "8": Fore.LIGHTRED_EX, 
+>>>>>>> lucas
     "M": Fore.LIGHTBLACK_EX
 }
 
@@ -19,8 +26,18 @@ def jugar():
     print("[1] Fácil")
     print("[2] Medio")
     print("[3] Difícil")
-    dificultad = int(input("Selecciona la dificultad: "))
-    
+    while True:
+        try:
+            entrada = input("Selecciona la dificultad (1-3): ")
+            dificultad = int(entrada)
+            
+            if 1 <= dificultad <= 3:
+                break 
+            else:
+                print("⚠️  Opción incorrecta. Por favor, elige 1, 2 o 3.")
+        except ValueError:
+            print("⚠️  Entrada no válida. Por favor, introduce un número.")
+                
     minas = generarMinas(dificultad)
     
     tablero_real = generar_tablero(dificultad, minas)
@@ -41,8 +58,18 @@ def jugar():
             print("Acción no válida.")
             continue
         
-        fila = int(input("Ingresa la fila: "))
-        columna = int(input("Ingresa la columna: "))
+        
+        try:
+            fila = int(input(f"Ingresa la fila (0-{tamaño-1}): "))
+            columna = int(input(f"Ingresa la columna (0-{tamaño-1}): "))
+            
+            if fila < 0 or fila >= tamaño or columna < 0 or columna >= tamaño:
+                print(f"❌ Coordenadas fuera de rango. Usa valores entre 0 y {tamaño-1}.")
+                continue
+                
+        except ValueError:
+            print("❌ Por favor, ingresa números válidos.")
+            continue
 
         if accion == "d":
             if tablero_real[fila][columna] == "M":
@@ -122,10 +149,31 @@ def marcar_mina(tablero_visible, fila, columna):
         tablero_visible[fila][columna] = "-"
     
 def mostrar_tablero(tablero):
+<<<<<<< HEAD
     for fila in tablero:
         for celda in fila:
             print(COLORES.get(celda, Fore.WHITE) + celda, end=" ")
         print()
+=======
+    tamaño = len(tablero)
+    ancho_fila = len(str(tamaño - 1))
+    
+    print(" " * (ancho_fila + 1), end="") 
+    
+    for col in range(tamaño):
+        print(f"{col:2}", end=" ") 
+    print() 
+    
+    for i, fila in enumerate(tablero):
+        print(f"{i:>{ancho_fila}} |", end=" ") 
+        #print(" ".join(f"{celda:2}" for celda in fila))
+        for celda in fila:
+            color = COLORES.get(celda, Fore.WHITE)
+            print(f"{color}{celda:2}{Style.RESET_ALL}", end=" ")
+        print()
+    print()
+
+>>>>>>> lucas
 
 def comprobar_victoria(tablero_visible, tablero_real):
     tamaño = len(tablero_real)
@@ -133,4 +181,8 @@ def comprobar_victoria(tablero_visible, tablero_real):
         for j in range(tamaño):
             if tablero_real[i][j] != "M" and tablero_visible[i][j] == "-":
                 return False
+<<<<<<< HEAD
     return True
+=======
+    return True
+>>>>>>> origin/alejandro
