@@ -41,6 +41,11 @@ def jugar():
     while True:
         mostrar_tablero(tablero_visible)
 
+        if comprobar_victoria(tablero_visible, tablero_real):
+            print("✨ ¡FELICIDADES! Has despejado todas las minas. ✨")
+            mostrar_tablero(tablero_real)
+            break
+        
         accion = input("¿Descubrir (d), marcar mina (m) o reiniciar (r)? ").lower()
         
         if accion == "r":
