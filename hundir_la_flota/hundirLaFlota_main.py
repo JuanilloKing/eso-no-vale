@@ -340,6 +340,11 @@ def elegir_disparo_maquina(tablero, memoria):
         if es_disparable(tablero, f, c):
             return f, c
 
+def obtener_columna(letra):
+    letras = 'ABCDEFGHIJ'
+    if letra in letras:
+        return letras.index(letra)
+    return -1
 
 def juego():
     """Bucle que dirige el programa de todo el juego"""
