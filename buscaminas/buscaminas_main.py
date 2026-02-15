@@ -68,7 +68,7 @@ def jugar():
             if tablero_real[fila][columna] == "M":
                 print("💥 ¡Has pisado una mina! Juego terminado.")
                 mostrar_tablero(tablero_real)
-                return
+                break
             descubrir_celda(tablero_real, tablero_visible, fila, columna)
 
         elif accion == "m":
