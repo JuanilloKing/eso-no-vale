@@ -402,10 +402,8 @@ def juego():
                 letras = 'ABCDEFGHIJ'
 
                 # Comprobación del rango de la casilla introducida
-                if 0 <= fila < 10 and col_letra in letras:
-                    for i in range(len(letras)):
-                        if letras[i] == col_letra:
-                            col = i
+                col = obtener_columna(col_letra)
+                if 0 <= fila < 10 and col != -1:
                     celda_objetivo = tablero_maquina_oculto[fila][col]
 
                     if celda_objetivo in letrasBarcos:
